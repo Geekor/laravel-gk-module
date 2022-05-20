@@ -1,0 +1,35 @@
+{
+    "name": "geekor/laravel-gk-module",
+    "description": "Geekor's module template for laravel v9.x",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Geekor",
+            "email": "geekor@outlook.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Geekor\\Module\\": "src/"
+        }
+    },
+    "minimum-stability": "dev",
+    "require": {
+        "geekor/laravel-gk-core": "dev-main",
+        "illuminate/http": "^6.9|^7.0|^8.0|^9.0",
+        "illuminate/container": "^6.9|^7.0|^8.0|^9.0",
+        "illuminate/support": "^6.9|^7.0|^8.0|^9.0",
+        "php" : "^7.3|^8.0|^8.1"
+    },
+    "require-dev": {
+        "illuminate/testing": "^6.9|^7.0|^8.0|^9.0"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Geekor\\Module\\ServiceProvider"
+            ]
+        }
+    }
+}

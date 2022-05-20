@@ -1,0 +1,130 @@
+<?php
+
+namespace {{ namespace }};
+
+use Illuminate\Http\Request;
+
+use Geekor\BackendMaster\Http\Controllers\Api\BaseController;
+use Geekor\Core\Support\GkApi;
+
+use {{ modelClass }};
+
+class {{ class }} extends BaseController
+{
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function index()
+    {
+        //...权限拦截
+        // $user = $this->getUserAndCheckHasPermission('xxx');
+
+        // $params = $this->getPageParams($request);
+        // ...
+        // $query = {{ model }}::where('id', '>', 0 );
+        //
+        // $total = $query->count();
+        // $query->skip($params['offset'])->take($params['limit']);
+        //
+        // $data = [
+        //     'total' => $total,
+        //     'items' => $query->get()->toArray()
+        // ];
+
+        // return GkApi::success($data);
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function store(Request $request)
+    {
+        //...权限拦截
+        // $user = $this->getUserAndCheckHasPermission('xxx');
+
+        //...检查输入参数
+        // $this->checkRequestInput($request, [
+        //     'xxx' => 'required',
+        // ]);
+
+        // $attr = $request->only(['xxx', 'yyy']);
+        //
+        // if ($m = {{ model }}::create($attr)) {
+        //     ....
+        //     return GkApi::success();
+        //
+        // } else {
+        //     return GkApi::fail('SAVE_TO_DB_FAILED');
+        // }
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function show($id)
+    {
+        //...权限拦截
+        // $user = $this->getUserAndCheckHasPermission('xxx');
+
+        // if ($m = {{ model }}::find($id)) {
+        //     return GkApi::success($m);
+        // }
+
+        return GkApi::failxNotFound('xx not found');
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function update(Request $request, $id)
+    {
+        //...权限拦截
+        // $user = $this->getUserAndCheckHasPermission('xxx');
+
+        //...输入检测
+        // $this->checkRequestInput($request, [
+        //     'xxx' => 'required',
+        // ]);
+
+        // if ($m = {{ model }}::find($id)) {
+        //     $attr = $request->only(['xxx', 'yyy', 'zzz']);
+        //     $m->update($attr);
+        //
+        //     return GkApi::success();
+        // }
+
+        return GkApi::failxNotFound('xx not found');
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy($id)
+    {
+        //...权限拦截
+        // $user = $this->getUserAndCheckHasPermission('xxx');
+
+        // if ($m = {{ model }}::find($id)) {
+        //     $m->delete();
+        //
+        //     return GkApi::success();
+        // }
+
+        return GkApi::failxNotFound('xx not found');
+    }
+}

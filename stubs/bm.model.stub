@@ -1,0 +1,34 @@
+<?php
+
+namespace {{ namespace }};
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class {{ class }} extends Model
+{
+    use HasFactory;
+
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = {{ table }};
+
+    /**
+     * 指定不可被修改的字段
+     */
+    protected $guarded = ['id'];
+
+    protected $fillable = [
+    ];
+
+    /**
+     * The attributes that should be hidden for arrays.
+     *
+     * @var array
+     */
+    protected $hidden = [
+    ];
+}
