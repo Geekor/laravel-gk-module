@@ -2,8 +2,8 @@
 
 namespace Geekor\Module\Console\Commands;
 
-use Geekor\Core\Support\GkFileUtil;
 use Geekor\Module\Models\DynamicModel;
+use Geekor\Module\Support\GkFile;
 use Geekor\Module\Support\GkStub;
 use Illuminate\Console\Command;
 
@@ -17,18 +17,45 @@ class MakeModule extends Command
             {table : database table name}';
 
     protected $description = 'Geekor Backend Master: make a new module';
+
     //--------------------
 
-    protected $module_dir = self::MODULE_DIR;
-
-    protected $table_name = ''; // xyzs
-    protected $model_name = ''; // Xyz
-    protected $model_class = ''; // Modules\Xyz\Models\Xyz
-
-    public function __construct()
-    {
-        parent::__construct();
-    }
+    /**
+     * _modules/Xyz
+     */
+    protected $moduleDir = self::MODULE_DIR;
+    /**
+     * Modules\Xyz
+     */
+    protected $moduleNamespace = '';
+    /**
+     * xyzs
+     */
+    protected $tableName = '';
+    /**
+     * Xyz
+     */
+    protected $modelName = '';
+    /**
+     * Models\Xyz
+     */
+    protected $modelClassUsingPath = '';
+    /**
+     * XyzController
+     */
+    protected $ctrlName = '';
+    /**
+     * /Http/Controllers/Api
+     */
+    protected $ctrlDir = '';
+    /**
+     * Http\Controllers\Api
+     */
+    protected $ctrlDirNamespace = '';
+    /**
+     * Http\Controllers\Api\XyzController
+     */
+    protected $ctrlClassUsingPath = '';
 
     /**
      * Execute the console command.
@@ -42,11 +69,20 @@ class MakeModule extends Command
         $this->newLine();
         //----------------
 
-        $this->model_name = $this->argument('model');
-        $this->table_name = $this->argument('table');
-        // var_dump($model_name, $table_name);
+        $this->tableName = $this->argument('table');
+        $this->modelName = $this->argument('model');
+        $this->moduleNamespace = vsprintf('Modules\%s', [ $this->modelName ]);
 
+        $this->modelClassUsingPath = vsprintf('%s\Models\%s', [ $this->moduleNamespace, $this->modelName ]);
+        $this->ctrlName = $this->modelName . 'Controller';
+        $this->ctrlDir = '/Http/Controllers/Api';
+        $this->ctrlDirNamespace = 'Http\Controllers\Api';
+        $this->ctrlClassUsingPath = vsprintf('%s\%s', [ $this->ctrlDirNamespace, $this->ctrlName ]);
+        
+        //..........................
         $this->clear_module_dir();
+
+        $this->make_routes();
         $this->make_migration();
         $this->make_model();
         $this->make_controller();
@@ -57,16 +93,17 @@ class MakeModule extends Command
     //====================================
     private function clear_module_dir()
     {
-        $this->module_dir = base_path(self::MODULE_DIR) . DIRECTORY_SEPARATOR . $this->model_name;
-        var_dump($this->module_dir);
+        $this->moduleDir = base_path(self::MODULE_DIR) . DIRECTORY_SEPARATOR . $this->modelName;
+        echo('Generate Module to: ' . $this->moduleDir);
+        $this->newLine(2);
 
-        @mkdir($this->module_dir, 0755, true);
-        GkFileUtil::rm($this->module_dir, false);
+        @mkdir($this->moduleDir, 0755, true);
+        GkFile::rm($this->moduleDir, false);
     }
 
     private function get_module_dir_path($sub_dir, $file_name)
     {
-        $path = $this->module_dir . $sub_dir;
+        $path = $this->moduleDir . $sub_dir;
         @mkdir($path, 0755, true);
 
         return $path . DIRECTORY_SEPARATOR . $file_name;
@@ -81,14 +118,35 @@ class MakeModule extends Command
 
     //=====================
 
+    private function make_routes()
+    {
+        $file_name = 'normal.php';
+        $dir = '/routes/api';
+        $stub = 'bm.route.api.normal';
+        $attrs = [
+            'table' => $this->tableName,
+            'model' => $this->modelName,
+            'ctrlClassUsing' => vsprintf('%s\Backend\%s', [ $this->moduleNamespace, $this->ctrlClassUsingPath ]),
+            'ctrlClassName' => $this->ctrlName
+        ];
+
+        $this->create_stub($dir, $file_name, $stub, $attrs);
+
+        // [后台]专用 (只修改上面部分的参数即可)
+        $file_name = 'backend.php';
+        $stub = 'bm.route.api.backend';
+        $attrs['ctrlClassUsing'] = vsprintf('%s\%s', [ $this->moduleNamespace, $this->ctrlClassUsingPath ]);
+        $this->create_stub($dir, $file_name, $stub, $attrs);
+    }
+
     private function make_migration()
     {
         $timestamp = date('Y_m_d_his');
-        $file_name = vsprintf('%s_create_%s_table.php', [ $timestamp, $this->table_name ]);
+        $file_name = vsprintf('%s_create_%s_table.php', [ $timestamp, $this->tableName ]);
         $dir = '/database/migrations';
         $stub = 'migration.create';
         $attrs = [
-            'table' => $this->table_name,
+            'table' => $this->tableName,
         ];
 
         $this->create_stub($dir, $file_name, $stub, $attrs);
@@ -96,38 +154,35 @@ class MakeModule extends Command
 
     private function make_model()
     {
-        $file_name = vsprintf('%s.php', [ $this->model_name ]);
+        $file_name = vsprintf('%s.php', [ $this->modelName ]);
         $dir = '/Models';
         $stub = 'bm.model';
         $attrs = [
-            'namespace' => vsprintf('Modules\%s\Models', [ $this->model_name ]),
-            'class' => $this->model_name,
-            'table' => $this->table_name
+            'namespace' => $this->moduleNamespace . '\Models',
+            'class' => $this->modelName,
+            'table' => $this->tableName
         ];
-
-        $this->model_class = $attrs['namespace'] . '\\' . $this->model_name ;
 
         $this->create_stub($dir, $file_name, $stub, $attrs);
     }
 
     private function make_controller()
     {
-        $className = $this->model_name . 'Controller';
-        $file_name = vsprintf('%s.php', [ $className ]);
-        $dir = '/Http/Controllers/Api';
+        $file_name = vsprintf('%s.php', [ $this->ctrlName ]);
+        $dir = $this->ctrlDir;
         $stub = 'bm.controller.api';
         $attrs = [
-            'namespace' => vsprintf('Modules\%s\Http\Controllers\Api', [ $this->model_name ]),
-            'class' => $className,
-            'model' => $this->model_name,
-            'modelClass' => $this->model_class
+            'namespace' => vsprintf('%s\%s', [ $this->moduleNamespace, $this->ctrlDirNamespace ]),
+            'class' => $this->ctrlName,
+            'model' => $this->modelName,
+            'modelClass' => $this->modelClassUsingPath
         ];
 
         $this->create_stub($dir, $file_name, $stub, $attrs);
 
-        //... 添加后台专用的
-        $dir = '/Backend/Http/Controllers/Api';
-        $attrs['namespace'] = vsprintf('Modules\%s\Backend\Http\Controllers\Api', [ $this->model_name ]);
+        //... 添加[后台]专用的
+        $dir = '/Backend' . $this->ctrlDir;
+        $attrs['namespace'] = vsprintf('%s\Backend\%s', [ $this->moduleNamespace, $this->ctrlDirNamespace ]);
 
         $this->create_stub($dir, $file_name, $stub, $attrs);
     }

@@ -1,0 +1,40 @@
+<?php
+
+use Illuminate\Support\Facades\Route;
+
+use {{ ctrlClassUsing }};
+
+/*
+|--------------------------------------------------------------------------
+| 关于 guard 的一点说明
+|--------------------------------------------------------------------------
+|
+| 'middleware' => 'auth:sanctum'，所有使用 sanctum 认证的都可以请求
+| 'middleware' => 'auth:master'，只有 guard 使用 master 的请求才能被允许
+| 'middleware' => 'auth:user'，只有 guard 使用 user 的请求才能被允许
+|
+| 那么如何获取 master guard 的 token？ 通过 masters 表的 Model 生成 token;
+| 那么如何获取 user guard 的 token？ 通过 users 表的 Model 生成 token;
+*/
+
+/*
+|--------------------------------------------------------------------------
+|  /api/{{ table }}
+|--------------------------------------------------------------------------
+*/
+Route::group([
+    'prefix' => '/api',
+    'middleware' => 'auth:user'
+],function() {
+
+    // Browse
+    Route::get('{{ table }}', {{ ctrlClassName }}::class.'@index');
+    // Add
+    Route::post('{{ table }}', {{ ctrlClassName }}::class.'@store');
+    // Read
+    Route::get('{{ table }}/{id}', {{ ctrlClassName }}::class.'@show');
+    // Edit
+    Route::put('{{ table }}/{id}', {{ ctrlClassName }}::class.'@update');
+    // Delete
+    Route::delete('{{ table }}', {{ ctrlClassName }}::class.'@destroy');
+});

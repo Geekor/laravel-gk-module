@@ -14,7 +14,7 @@ class {{ class }} extends Model
      *
      * @var string
      */
-    protected $table = {{ table }};
+    protected $table = '{{ table }}';
 
     /**
      * 指定不可被修改的字段
