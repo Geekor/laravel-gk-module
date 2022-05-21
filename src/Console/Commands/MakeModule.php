@@ -126,7 +126,7 @@ class MakeModule extends Command
         $attrs = [
             'table' => $this->tableName,
             'model' => $this->modelName,
-            'ctrlClassUsing' => vsprintf('%s\Backend\%s', [ $this->moduleNamespace, $this->ctrlClassUsingPath ]),
+            'ctrlClassUsing' => vsprintf('%s\Normal\%s', [ $this->moduleNamespace, $this->ctrlClassUsingPath ]),
             'ctrlClassName' => $this->ctrlName
         ];
 
@@ -135,7 +135,7 @@ class MakeModule extends Command
         // [后台]专用 (只修改上面部分的参数即可)
         $file_name = 'backend.php';
         $stub = 'bm.route.api.backend';
-        $attrs['ctrlClassUsing'] = vsprintf('%s\%s', [ $this->moduleNamespace, $this->ctrlClassUsingPath ]);
+        $attrs['ctrlClassUsing'] = vsprintf('%s\Backend\%s', [ $this->moduleNamespace, $this->ctrlClassUsingPath ]);
         $this->create_stub($dir, $file_name, $stub, $attrs);
     }
 
@@ -169,10 +169,10 @@ class MakeModule extends Command
     private function make_controller()
     {
         $file_name = vsprintf('%s.php', [ $this->ctrlName ]);
-        $dir = $this->ctrlDir;
+        $dir = '/Normal' .$this->ctrlDir;
         $stub = 'bm.controller.api';
         $attrs = [
-            'namespace' => vsprintf('%s\%s', [ $this->moduleNamespace, $this->ctrlDirNamespace ]),
+            'namespace' => vsprintf('%s\Normal\%s', [ $this->moduleNamespace, $this->ctrlDirNamespace ]),
             'class' => $this->ctrlName,
             'model' => $this->modelName,
             'modelClass' => $this->modelClassUsingPath

@@ -26,10 +26,11 @@ class ServiceProvider extends BaseServiceProvider
     {
         $this->loadTranslations();
 
-        if (app()->runningInConsole()) {
+        $this->loadCommands();
 
-            $this->loadCommands();
-        }
+        $this->loadMigrations();
+
+        $this->defineRoutes();
     }
 
     //////////////////////////////////////////////////
@@ -47,6 +48,10 @@ class ServiceProvider extends BaseServiceProvider
      */
     protected function loadCommands()
     {
+        if (! app()->runningInConsole()) {
+            return;
+        }
+
         // --------------------------- 自动扫描目录中的命令 ----
         // [1] 扫描出 php 文件
         // [2] 把 .../Commands/Check.php 转换成 Geekor\BackendMaster\Console\Commands\Check 的形式
@@ -55,7 +60,7 @@ class ServiceProvider extends BaseServiceProvider
         $path = __DIR__.$dir;
 
         // [1]
-        $fs = app()->make(Filesystem::class);
+        $fs = $this->app->make(Filesystem::class);
         $list = $fs->glob($path.'*.php');
 
         if (count($list) > 0) {
@@ -75,6 +80,44 @@ class ServiceProvider extends BaseServiceProvider
 
             // [3]
             $this->commands($cmds);
+        }
+    }
+
+    protected function loadMigrations()
+    {
+        if (! app()->runningInConsole()) {
+            return;
+        }
+
+        //...load sub modules migrations
+        $module_dir = base_path('_modules');
+
+        $fs = $this->app->make(Filesystem::class);
+        foreach($fs->directories($module_dir) as $m_dir) {
+            $this->loadMigrationsFrom($m_dir . '/database/migrations');
+        }
+    }
+
+    /**
+     * Define the Sanctum routes.
+     *
+     * @return void
+     */
+    protected function defineRoutes()
+    {
+        if (app()->routesAreCached()) {
+            return;
+        }
+
+        //...load sub modules routes
+        $module_dir = base_path('_modules');
+
+        $fs = $this->app->make(Filesystem::class);
+        foreach($fs->directories($module_dir) as $m_dir) {
+            
+            foreach($fs->glob($m_dir . '/routes/api/*.php') as $file) {
+                $this->loadRoutesFrom($file);
+            }
         }
     }
 
