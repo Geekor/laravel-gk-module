@@ -2,10 +2,10 @@
 
 namespace Geekor\Module\Console\Commands;
 
-use Geekor\Module\Models\DynamicModel;
-use Geekor\Module\Support\GkFile;
-use Geekor\Module\Support\GkStub;
+use Geekor\Module\Support\GkModuleStub;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Artisan;
+use Symfony\Component\Process\Process;
 
 class MakeModule extends Command
 {
@@ -78,7 +78,7 @@ class MakeModule extends Command
         $this->ctrlDir = '/Http/Controllers/Api';
         $this->ctrlDirNamespace = 'Http\Controllers\Api';
         $this->ctrlClassUsingPath = vsprintf('%s\%s', [ $this->ctrlDirNamespace, $this->ctrlName ]);
-        
+
         //..........................
         $this->clear_module_dir();
 
@@ -86,6 +86,16 @@ class MakeModule extends Command
         $this->make_migration();
         $this->make_model();
         $this->make_controller();
+
+        // --------------------------- dump info ----
+        $this->info('new migration:');
+        echo(shell_exec('php artisan migrate:status'));
+        // $this->call('migrate:status');
+
+        $this->info('new routes:');
+        echo(shell_exec('php artisan route:list --path='.$this->tableName));
+        // 这个命令没法立即获得路由信息，必须下次调用
+        // $this->call('route:list', ['--path' => $this->tableName]);
 
         return 0;
     }
@@ -98,7 +108,7 @@ class MakeModule extends Command
         $this->newLine(2);
 
         @mkdir($this->moduleDir, 0755, true);
-        GkFile::rm($this->moduleDir, false);
+        GkModuleStub::rm($this->moduleDir, false);
     }
 
     private function get_module_dir_path($sub_dir, $file_name)
@@ -112,7 +122,7 @@ class MakeModule extends Command
     private function create_stub($dir, $file_name, $stub, $attrs)
     {
         $file = $this->get_module_dir_path($dir, $file_name);
-        $content = GkStub::render($stub, $attrs);
+        $content = GkModuleStub::render($stub, $attrs);
         file_put_contents($file, $content);
     }
 

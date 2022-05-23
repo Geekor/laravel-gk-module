@@ -21,6 +21,11 @@ class {{ class }} extends BaseController
         //...权限拦截
         // $user = $this->getUserAndCheckHasPermission('xxx');
 
+        $data = [
+            'total' => 0,
+            'items' => []
+        ];
+
         // $params = $this->getPageParams($request);
         // ...
         // $query = {{ model }}::where('id', '>', 0 );
@@ -33,7 +38,7 @@ class {{ class }} extends BaseController
         //     'items' => $query->get()->toArray()
         // ];
 
-        // return GkApi::success($data);
+        return GkApi::success($data);
     }
 
     /**
@@ -59,7 +64,7 @@ class {{ class }} extends BaseController
         //     return GkApi::success();
         //
         // } else {
-        //     return GkApi::fail('SAVE_TO_DB_FAILED');
+            return GkApi::fail('SAVE_TO_DB_FAILED');
         // }
     }
 
