@@ -93,7 +93,7 @@ class ServiceProvider extends BaseServiceProvider
         $module_dir = base_path('_modules');
 
         $fs = $this->app->make(Filesystem::class);
-        if (! $fs->is_dir($module_dir)) {
+        if (! is_dir($module_dir)) {
             return;
         }
 
@@ -118,7 +118,7 @@ class ServiceProvider extends BaseServiceProvider
 
         $fs = $this->app->make(Filesystem::class);
 
-        if (! $fs->is_dir($module_dir)) {
+        if (! is_dir($module_dir)) {
             return;
         }
 
