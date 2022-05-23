@@ -5,6 +5,8 @@ namespace Geekor\Module;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
 
+use Geekor\Module\Consts;
+
 class ServiceProvider extends BaseServiceProvider
 {
     /**
