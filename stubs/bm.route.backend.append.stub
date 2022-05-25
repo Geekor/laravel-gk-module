@@ -1,0 +1,25 @@
+
+/*
+|--------------------------------------------------------------------------
+|  /api/backend/{{ table }}/
+|--------------------------------------------------------------------------
+*/
+
+use {{ ctrlClassUsing }};
+
+Route::group([
+    'prefix' => $API_PREFIX,
+    'middleware' => 'auth:master'
+],function() {
+
+    // Browse
+    Route::get('{{ table }}', {{ ctrlClassName }}::class.'@index');
+    // Add
+    Route::post('{{ table }}', {{ ctrlClassName }}::class.'@store');
+    // Read
+    Route::get('{{ table }}/{id}', {{ ctrlClassName }}::class.'@show');
+    // Edit
+    Route::put('{{ table }}/{id}', {{ ctrlClassName }}::class.'@update');
+    // Delete
+    Route::delete('{{ table }}', {{ ctrlClassName }}::class.'@destroy');
+});

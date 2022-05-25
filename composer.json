@@ -27,7 +27,8 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Geekor\\Module\\ServiceProvider"
+                "Geekor\\Module\\ServiceProvider",
+                "Geekor\\Module\\AuthServiceProvider"
             ]
         }
     }

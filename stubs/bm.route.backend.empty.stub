@@ -2,8 +2,6 @@
 
 use Illuminate\Support\Facades\Route;
 
-use {{ ctrlClassUsing }};
-
 /*
 |--------------------------------------------------------------------------
 | 关于 guard 的一点说明
@@ -17,7 +15,7 @@ use {{ ctrlClassUsing }};
 | 那么如何获取 user guard 的 token？ 通过 users 表的 Model 生成 token;
 |
 |--------------------------------------------------------------------------
-|  /api/backend/{{ table }}
+|  /api/xxx
 |--------------------------------------------------------------------------
 */
 
@@ -25,17 +23,9 @@ $API_PREFIX = vsprintf('/api/%s', [config('bm.prefix', 'backend')]);
 
 Route::group([
     'prefix' => $API_PREFIX,
-    'middleware' => 'auth:master'
+    'middleware' => 'auth:sanctum'
 ],function() {
 
-    // Browse
-    Route::get('{{ table }}', {{ ctrlClassName }}::class.'@index');
-    // Add
-    Route::post('{{ table }}', {{ ctrlClassName }}::class.'@store');
-    // Read
-    Route::get('{{ table }}/{id}', {{ ctrlClassName }}::class.'@show');
-    // Edit
-    Route::put('{{ table }}/{id}', {{ ctrlClassName }}::class.'@update');
-    // Delete
-    Route::delete('{{ table }}', {{ ctrlClassName }}::class.'@destroy');
+    // ...
+
 });

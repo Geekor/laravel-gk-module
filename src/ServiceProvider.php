@@ -93,12 +93,11 @@ class ServiceProvider extends BaseServiceProvider
 
         //...load sub modules migrations
         $module_dir = base_path('_modules');
-
-        $fs = $this->app->make(Filesystem::class);
         if (! is_dir($module_dir)) {
             return;
         }
 
+        $fs = $this->app->make(Filesystem::class);
         foreach($fs->directories($module_dir) as $m_dir) {
             $this->loadMigrationsFrom($m_dir . '/database/migrations');
         }
@@ -117,16 +116,14 @@ class ServiceProvider extends BaseServiceProvider
 
         //...load sub modules routes
         $module_dir = base_path('_modules');
-
-        $fs = $this->app->make(Filesystem::class);
-
         if (! is_dir($module_dir)) {
             return;
         }
 
+        $fs = $this->app->make(Filesystem::class);
         foreach($fs->directories($module_dir) as $m_dir) {
 
-            foreach($fs->glob($m_dir . '/routes/api/*.php') as $file) {
+            foreach($fs->glob($m_dir . '/routes/*.php') as $file) {
                 $this->loadRoutesFrom($file);
             }
         }

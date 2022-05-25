@@ -15,13 +15,12 @@ use {{ ctrlClassUsing }};
 |
 | 那么如何获取 master guard 的 token？ 通过 masters 表的 Model 生成 token;
 | 那么如何获取 user guard 的 token？ 通过 users 表的 Model 生成 token;
-*/
-
-/*
+|
 |--------------------------------------------------------------------------
 |  /api/{{ table }}
 |--------------------------------------------------------------------------
 */
+
 Route::group([
     'prefix' => '/api',
     'middleware' => 'auth:user'
