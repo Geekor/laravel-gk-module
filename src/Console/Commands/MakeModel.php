@@ -108,14 +108,14 @@ class MakeModel extends Command
         $this->make_controller();
 
         // --------------------------- dump info ----
-        $this->newLine();
-        $this->info('new migration:');
-        echo(shell_exec('php artisan migrate:status'));
+        // 因为只有在下次调用才会有显示，所以不调用 $this->call('route:list', ['--path' => $this->tableName]);
 
-        $this->info('new routes:');
-        echo(shell_exec('php artisan route:list --path='.$this->tableName));
-        // 这个命令没法立即获得路由信息，因为这必须下次调用才会有显示
-        // $this->call('route:list', ['--path' => $this->tableName]);
+        $this->newLine();
+        $this->info('for checking migration:');
+        $this->info('    php artisan migrate:status');
+
+        $this->info('for checking routes:');
+        $this->info('    php artisan route:list --path='.$this->tableName);
 
         $this->newLine(2);
         return 0;
