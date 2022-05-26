@@ -25,13 +25,16 @@ class MakeModel extends Command
     protected $description = 'Geekor Module: make a model in target module';
 
     //--------------------
-
     /**
-     * _modules/Xyz
+     * Abc
+     */
+    protected $moduleName = '';
+    /**
+     * _modules/Abc
      */
     protected $moduleDir = self::MODULE_DIR;
     /**
-     * Modules\Xyz
+     * Modules\Abc
      */
     protected $moduleNamespace = '';
     /**
@@ -43,7 +46,7 @@ class MakeModel extends Command
      */
     protected $modelName = '';
     /**
-     * Models\Xyz
+     * Modules\Abc\Models\Xyz
      */
     protected $modelClassUsingPath = '';
     /**
@@ -75,10 +78,11 @@ class MakeModel extends Command
         $this->newLine();
         //----------------
 
-        $this->moduleDir = base_path(self::MODULE_DIR) . DIRECTORY_SEPARATOR . Str::ucfirst( $this->argument('module') );
+        $this->moduleName = Str::ucfirst( $this->argument('module') );
+        $this->moduleDir = base_path(self::MODULE_DIR) . DIRECTORY_SEPARATOR . $this->moduleName;
         $this->tableName = $this->argument('table');
         $this->modelName = $this->argument('model');
-        $this->moduleNamespace = vsprintf('Modules\%s', [ Str::ucfirst($this->modelName) ]);
+        $this->moduleNamespace = vsprintf('Modules\%s', [ Str::ucfirst($this->moduleName) ]);
 
         $this->modelClassUsingPath = vsprintf('%s\Models\%s', [ $this->moduleNamespace, $this->modelName ]);
         $this->ctrlName = $this->modelName . 'Controller';
