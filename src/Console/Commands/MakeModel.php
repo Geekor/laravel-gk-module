@@ -80,8 +80,8 @@ class MakeModel extends Command
 
         $this->moduleName = Str::ucfirst( $this->argument('module') );
         $this->moduleDir = base_path(self::MODULE_DIR) . DIRECTORY_SEPARATOR . $this->moduleName;
-        $this->tableName = $this->argument('table');
-        $this->modelName = $this->argument('model');
+        $this->tableName = Str::lower( $this->argument('table') );
+        $this->modelName = Str::ucfirst( $this->argument('model') );
         $this->moduleNamespace = vsprintf('Modules\%s', [ Str::ucfirst($this->moduleName) ]);
 
         $this->modelClassUsingPath = vsprintf('%s\Models\%s', [ $this->moduleNamespace, $this->modelName ]);
@@ -117,6 +117,7 @@ class MakeModel extends Command
         $this->newLine();
         $this->info('for checking migration:');
         $this->info('    php artisan migrate:status');
+        $this->newLine();
 
         $this->info('for checking routes:');
         $this->info('    php artisan route:list --path='.$this->tableName);
