@@ -2,6 +2,11 @@
 
 return [
 
+    // these will append to (App\Http\Kernel::$routeMiddleware);
+    'routeMiddleware' => [
+        // 'name' => \Modules\...\Xxx::class,
+    ],
+
     'policies' => [
         // 'App\Models\Model' => 'App\Policies\ModelPolicy',
     ]

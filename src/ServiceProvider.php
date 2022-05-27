@@ -2,10 +2,13 @@
 
 namespace Geekor\Module;
 
+use App\Http\Kernel as AppKernel;
+use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
 
 use Geekor\Module\Consts;
+use Illuminate\Support\Arr;
 
 class ServiceProvider extends BaseServiceProvider
 {
@@ -33,6 +36,8 @@ class ServiceProvider extends BaseServiceProvider
         $this->loadMigrations();
 
         $this->defineRoutes();
+
+        $this->configureMiddleware();
     }
 
     //////////////////////////////////////////////////
@@ -62,7 +67,7 @@ class ServiceProvider extends BaseServiceProvider
         $path = __DIR__.$dir;
 
         // [1]
-        $fs = $this->app->make(Filesystem::class);
+        $fs = resolve(Filesystem::class);
         $list = $fs->glob($path.'*.php');
 
         if (count($list) > 0) {
@@ -97,7 +102,7 @@ class ServiceProvider extends BaseServiceProvider
             return;
         }
 
-        $fs = $this->app->make(Filesystem::class);
+        $fs = resolve(Filesystem::class);
         foreach($fs->directories($module_dir) as $m_dir) {
             $this->loadMigrationsFrom($m_dir . '/database/migrations');
         }
@@ -120,11 +125,58 @@ class ServiceProvider extends BaseServiceProvider
             return;
         }
 
-        $fs = $this->app->make(Filesystem::class);
+        $fs = resolve(Filesystem::class);
         foreach($fs->directories($module_dir) as $m_dir) {
 
             foreach($fs->glob($m_dir . '/routes/*.php') as $file) {
                 $this->loadRoutesFrom($file);
+            }
+        }
+    }
+
+    /**
+     * 添加中间件
+     *
+     * @return void
+     */
+    protected function configureMiddleware()
+    {
+        $routeMiddlewares = [];
+
+        $module_dir = base_path('_modules');
+        if (is_dir($module_dir)) {
+            $fs = resolve(Filesystem::class);
+            foreach($fs->directories($module_dir) as $m_dir) {
+                $arr = require_once($m_dir . '/module-config.php');
+
+                foreach ($arr['routeMiddleware'] ?? [] as $k => $v) {
+                    if (Arr::has($routeMiddlewares, $k)) {
+                        die("\n !! >>> routeMiddleware name of [$k] already defined by $v \n\n");
+                    }
+
+                    $routeMiddlewares[$k] = $v;
+                }
+            }
+        }
+
+        // Kernel 在 App 中是单例，
+        // 通过 make() 实际只是取得单例。
+        $kernel = resolve(Kernel::class);
+
+        if ($kernel instanceof AppKernel) {
+
+            // ----- 下面是要注册到 全局中间件列表
+            // $kernel->prependMiddleware(XXXX::class);
+
+            // ----- 下面是要注册到 路由中间件列表
+
+            if(! method_exists($kernel,'appendToRouteMiddleware')) {
+                echo('You need add (use \Geekor\BackendMaster\Traits\SettingRoutes;) in app\Http\Kernel.php');
+
+            } else {
+                foreach ($routeMiddlewares as $key => $middleware) {
+                    $kernel->appendToRouteMiddleware($key, $middleware);
+                }
             }
         }
     }

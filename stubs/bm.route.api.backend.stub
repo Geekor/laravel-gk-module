@@ -17,7 +17,7 @@ use {{ ctrlClassUsing }};
 | 那么如何获取 user guard 的 token？ 通过 users 表的 Model 生成 token;
 |
 |--------------------------------------------------------------------------
-|  /api/backend/{{ table }}
+|  /api/backend/{{ apiName }}
 |--------------------------------------------------------------------------
 */
 
@@ -29,13 +29,13 @@ Route::group([
 ],function() {
 
     // Browse
-    Route::get('{{ table }}', {{ ctrlClassName }}::class.'@index');
+    Route::get('{{ apiName }}', {{ ctrlClassName }}::class.'@index');
     // Add
-    Route::post('{{ table }}', {{ ctrlClassName }}::class.'@store');
+    Route::post('{{ apiName }}', {{ ctrlClassName }}::class.'@store');
     // Read
-    Route::get('{{ table }}/{id}', {{ ctrlClassName }}::class.'@show');
+    Route::get('{{ apiName }}/{id}', {{ ctrlClassName }}::class.'@show');
     // Edit
-    Route::put('{{ table }}/{id}', {{ ctrlClassName }}::class.'@update');
+    Route::put('{{ apiName }}/{id}', {{ ctrlClassName }}::class.'@update');
     // Delete
-    Route::delete('{{ table }}', {{ ctrlClassName }}::class.'@destroy');
+    Route::delete('{{ apiName }}', {{ ctrlClassName }}::class.'@destroy');
 });

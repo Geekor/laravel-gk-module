@@ -28,7 +28,7 @@ class AuthServiceProvider extends ServiceProvider
         // 导入 _modules 目录中的配置
         $module_dir = base_path('_modules');
         if (is_dir($module_dir)) {
-            $fs = $this->app->make(Filesystem::class);
+            $fs = resolve(Filesystem::class);
             foreach($fs->directories($module_dir) as $m_dir) {
                 $arr = require_once($m_dir . '/module-config.php');
 

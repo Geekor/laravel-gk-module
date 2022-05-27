@@ -15,11 +15,10 @@ class MakeModel extends Command
 
     protected $signature =
         'bm:make-model
-        {--no-backend}
-        {--no-normal}
         {module : module name}
         {model : model name}
-        {table : database table name}
+        {--no-backend}
+        {--no-normal}
         ';
 
     protected $description = 'Geekor Module: make a model in target module';
@@ -49,6 +48,10 @@ class MakeModel extends Command
      * Modules\Abc\Models\Xyz
      */
     protected $modelClassUsingPath = '';
+    /**
+     * ModelName -> model-names
+     */
+    protected $apiName = '';
     /**
      * XyzController
      */
@@ -80,9 +83,10 @@ class MakeModel extends Command
 
         $this->moduleName = Str::ucfirst( $this->argument('module') );
         $this->moduleDir = base_path(self::MODULE_DIR) . DIRECTORY_SEPARATOR . $this->moduleName;
-        $this->tableName = Str::lower( $this->argument('table') );
-        $this->modelName = Str::ucfirst( $this->argument('model') );
+        $this->modelName = Str::studly( $this->argument('model') );
         $this->moduleNamespace = vsprintf('Modules\%s', [ Str::ucfirst($this->moduleName) ]);
+        $this->tableName = Str::snake(Str::pluralStudly($this->modelName)); // ModelName -> model_names
+        $this->apiName = Str::kebab(Str::pluralStudly($this->modelName)); // ModelName -> model-names
 
         $this->modelClassUsingPath = vsprintf('%s\Models\%s', [ $this->moduleNamespace, $this->modelName ]);
         $this->ctrlName = $this->modelName . 'Controller';
@@ -112,7 +116,7 @@ class MakeModel extends Command
         $this->make_controller();
 
         // --------------------------- dump info ----
-        // 因为只有在下次调用才会有显示，所以不调用 $this->call('route:list', ['--path' => $this->tableName]);
+        // 因为只有在下次调用才会有显示，所以不调用 $this->call('route:list', ['--path' => $this->apiName]);
 
         $this->newLine();
         $this->info('for checking migration:');
@@ -120,7 +124,7 @@ class MakeModel extends Command
         $this->newLine();
 
         $this->info('for checking routes:');
-        $this->info('    php artisan route:list --path='.$this->tableName);
+        $this->info('    php artisan route:list --path='.$this->apiName);
 
         $this->newLine(2);
         return 0;
@@ -165,7 +169,7 @@ class MakeModel extends Command
         $dir = '/routes';
         $stub = 'bm.route.normal.append';
         $attrs = [
-            'table' => $this->tableName,
+            'apiName' => $this->apiName,
             'model' => $this->modelName,
             'ctrlClassUsing' => vsprintf('%s\App\%s', [ $this->moduleNamespace, $this->ctrlClassUsingPath ]),
             'ctrlClassName' => $this->ctrlName
@@ -174,7 +178,7 @@ class MakeModel extends Command
         if (! $this->option("no-normal")) {
             $file = $this->get_module_dir_path($dir, $file_name);
             $content = file_get_contents($file);
-            if (! Str::contains($content, vsprintf('/api/%s/',[$this->tableName]))) {
+            if (! Str::contains($content, vsprintf('/api/%s/',[$this->apiName]))) {
                 $this->append_stub($dir, $file_name, $stub, $attrs);
                 $this->line(" > append routes into: $dir/$file_name");
             }
@@ -189,7 +193,7 @@ class MakeModel extends Command
         if (! $this->option("no-backend")) {
             $file = $this->get_module_dir_path($dir, $file_name);
             $content = file_get_contents($file);
-            if (! Str::contains($content, vsprintf('/api/backend/%s/',[$this->tableName]))) {
+            if (! Str::contains($content, vsprintf('/api/backend/%s/',[$this->apiName]))) {
                 $this->append_stub($dir, $file_name, $stub, $attrs);
                 $this->line(" > append routes into: $dir/$file_name");
             }
@@ -204,7 +208,7 @@ class MakeModel extends Command
         $dir = '/database/migrations';
         $stub = 'migration.create';
         $attrs = [
-            'table' => $this->tableName,
+            'table' => Str::kebab($this->tableName),
         ];
 
         // 如果已经创建了迁移文件，就不用再次创建啦
